@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Формула-1 — презентация</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', 'Helvetica Neue', sans-serif;
+      background: #f4f4f4;
+      overflow: hidden;
+      color: #111;
+    }
+
+    .presentation {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4vw 6vw;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: scale(1.02);
+      pointer-events: none;
+      background: #ffffff;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    /* ====== ФОНОВОЕ ИЗОБРАЖЕНИЕ (слайд 1 и финал) ====== */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      /* страховочный градиент, если картинка не загрузится */
+      background: linear-gradient(135deg, #f7f7f7 0%, #e6e6e6 100%);
+    }
+
+    .hero-bg::before {
+      /* декоративный паттерн, видимый только если картинки нет */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(135deg, rgba(225,6,0,0.07) 0 40px, transparent 40px 80px);
+      z-index: 0;
+    }
+
+    .hero-bg img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 55%;
+      display: block;
+    }
+
+    .hero-bg::after {
+      /* светлая вуаль: текст читается, картинка видна справа */
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.93) 0%,
+        rgba(255,255,255,0.72) 40%,
+        rgba(255,255,255,0.18) 100%);
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      width: 100%;
+      text-align: left;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      text-transform: uppercase;
+      color: #111;
+      margin-bottom: 0.3em;
+    }
+
+    h1 span { color: #e10600; }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: #111;
+      margin-bottom: 0.6em;
+      border-left: 6px solid #e10600;
+      padding-left: 18px;
+    }
+
+    h3 {
+      font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+      font-weight: 700;
+      color: #e10600;
+      margin-bottom: 0.4em;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    p, li {
+      font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+      line-height: 1.55;
+      color: #333;
+      margin-bottom: 0.6em;
+    }
+
+    ul { list-style: none; padding: 0; }
+
+    ul li {
+      position: relative;
+      padding-left: 1.6em;
+      margin-bottom: 0.7em;
+    }
+
+    ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #e10600;
+      font-weight: 900;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e10600;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25em 0.9em;
+      border-radius: 2px;
+      margin-bottom: 1em;
+    }
+
+    .image-container {
+      margin-top: 1.5em;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      max-height: 40vh;
+      background: #fff;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-caption {
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 0.5em;
+      text-align: right;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5em;
+      align-items: center;
+      margin-top: 1em;
+    }
+
+    .two-col-reverse {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5em;
+      align-items: center;
+      margin-top: 1em;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2em;
+      margin-top: 1.5em;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.2em 1.4em;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .stat-card .number {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 900;
+      color: #e10600;
+      line-height: 1;
+      margin-bottom: 0.2em;
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat-card p { color: #555; }
+
+    .points-table {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em;
+      margin-top: 1.2em;
+    }
+
+    .points-table span {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.5em 0.9em;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #222;
+    }
+
+    .points-table span:first-child {
+      background: #e10600;
+      border-color: #e10600;
+      color: #fff;
+    }
+
+    /* Навигация */
+    .nav {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e0e0e0;
+      padding: 10px 22px;
+      border-radius: 40px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+
+    .nav button {
+      background: none;
+      border: none;
+      color: #222;
+      font-size: 1.4rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .nav button:hover { background: #f0f0f0; }
+
+    .nav .counter {
+      font-size: 0.9rem;
+      color: #666;
+      min-width: 50px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: #e10600;
+      z-index: 200;
+      transition: width 0.4s ease;
+      width: 10%;
+    }
+
+    /* Титульный слайд */
+    .title-slide {
+      justify-content: flex-end;
+      padding-bottom: 10vh;
+    }
+
+    .title-slide .slide-content { text-align: left; }
+
+    .title-slide h1 { font-size: clamp(3rem, 8vw, 7rem); }
+
+    .title-slide .subtitle {
+      font-size: clamp(1rem, 1.6vw, 1.4rem);
+      color: #444;
+      margin-top: 0.5em;
+      letter-spacing: 0.02em;
+    }
+
+    .red-line {
+      width: 80px;
+      height: 5px;
+      background: #e10600;
+      margin-bottom: 1.2em;
+    }
+
+    /* Адаптив */
+    @media (max-width: 768px) {
+      .slide { padding: 5vh 6vw; }
+
+      .two-col,
+      .two-col-reverse {
+        grid-template-columns: 1fr;
+        gap: 1.5em;
+      }
+
+      .two-col-reverse .image-container { order: -1; }
+
+      .image-container { max-height: 28vh; }
+
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+
+      .nav {
+        bottom: 14px;
+        padding: 8px 16px;
+        gap: 10px;
+      }
+
+      h2 {
+        border-left-width: 4px;
+        padding-left: 12px;
+      }
+
+      .hero-bg::after {
+        background: linear-gradient(180deg,
+          rgba(255,255,255,0.92) 0%,
+          rgba(255,255,255,0.75) 55%,
+          rgba(255,255,255,0.35) 100%);
+      }
+    }
+
+    @media (max-height: 650px) {
+      .image-container { max-height: 22vh; }
+      h1 { font-size: clamp(1.8rem, 4vw, 3rem); }
+    }
+
+    .arrow {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .arrow-left { transform: rotate(-135deg); }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- Слайд 1: Титул с фоновым изображением -->
+  <section class="slide active title-slide" data-index="0">
+    <div class="hero-bg">
+      <img
+        src="https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&fit=crop&w=1920&q=80"
+        alt="Болид Формулы-1 на трассе"
+        onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg/1280px-2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg';"
+      >
+    </div>
+    <div class="slide-content">
+      <div class="red-line"></div>
+      <div class="badge">Презентация</div>
+      <h1>Формула-<span>1</span></h1>
+      <p class="subtitle">Высший класс кольцевых автогонок. Скорость, технологии, история.</p>
+    </div>
+  </section>
+
+  <!-- Слайд 2: Определение -->
+  <section class="slide" data-index="1">
+    <div class="slide-content">
+      <h2>Что такое Формула-1</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Формула-1 (F1)</strong> — высший класс кольцевых автогонок на автомобилях с открытыми колёсами, проводящийся под эгидой Международной автомобильной федерации (FIA).</p>
+          <p>Чемпионат проводится ежегодно с <strong>1950 года</strong> и состоит из серии этапов — Гран-при.</p>
+          <p>Соревнования проходят на специально построенных автодромах или перекрытых городских трассах по всему миру.</p>
+        </div>
+        <div>
+          <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg/1280px-Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg" alt="Трасса Монако с воздуха">
+          </div>
+          <div class="image-caption">Монако — визитная карточка Ф1. Фото: Wikimedia Commons</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 3: Структура чемпионата -->
+  <section class="slide" data-index="2">
+    <div class="slide-content">
+      <h2>Структура чемпионата</h2>
+      <p>В каждом сезоне разыгрываются два независимых титула:</p>
+      <div class="stat-grid" style="margin-top:2em;">
+        <div class="stat-card">
+          <div class="number">01</div>
+          <div class="label">Чемпионат мира среди пилотов</div>
+          <p style="margin-top:0.6em; font-size:0.9rem;">Личное первенство. Титул достаётся пилоту, набравшему наибольшее количество очков по итогам сезона.</p>
+        </div>
+        <div class="stat-card">
+          <div class="number">02</div>
+          <div class="label">Кубок конструкторов</div>
+          <p style="margin-top:0.6em; font-size:0.9rem;">Командное первенство. Очки обоих основных пилотов команды суммируются за каждый этап.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 4: Формат уик-энда -->
+  <section class="slide" data-index="3">
+    <div class="slide-content">
+      <h2>Формат гоночного уик-энда</h2>
+      <div class="two-col">
+        <div>
+          <h3>Стандартный уик-энд</h3>
+          <ul>
+            <li><strong>Свободные заезды:</strong> 3 сессии (пятница и суббота) — настройка болида, тесты шин, сбор телеметрии.</li>
+            <li><strong>Квалификация:</strong> Q1, Q2, Q3 с постепенным выбыванием медленнейших пилотов для определения стартовой решётки.</li>
+            <li><strong>Гонка:</strong> основная дистанция ~305 км (или максимум 2 часа), кроме Гран-при Монако.</li>
+          </ul>
+          <h3 style="margin-top:1em;">Спринт-уик-энд</h3>
+          <p>На некоторых этапах в субботу проводится короткая гонка (<strong>Спринт</strong>), которая даёт отдельные очки и определяет стартовую решётку воскресной гонки.</p>
+        </div>
+        <div>
+          <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg/1280px-2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg" alt="Болид Haas VF-25">
+          </div>
+          <div class="image-caption">Болид Haas VF-25, Гран-при Японии 2025. Фото: Wikimedia Commons</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 5: Очки -->
+  <section class="slide" data-index="4">
+    <div class="slide-content">
+      <h2>Система начисления очков</h2>
+      <p>Очки присуждаются первым 10 пилотам на финише основной гонки:</p>
+      <div class="points-table">
+        <span>1 — 25</span>
+        <span>2 — 18</span>
+        <span>3 — 15</span>
+        <span>4 — 12</span>
+        <span>5 — 10</span>
+        <span>6 — 8</span>
+        <span>7 — 6</span>
+        <span>8 — 4</span>
+        <span>9 — 2</span>
+        <span>10 — 1</span>
+      </div>
+      <div style="margin-top:2em; background:#fff3f3; border-left:4px solid #e10600; padding:1.2em 1.5em; border-radius:4px;">
+        <h3 style="margin-bottom:0.3em;">Важное изменение</h3>
+        <p style="margin-bottom:0;">С сезона <strong>2025 года</strong> бонусный балл за быстрейший круг отменён — для упрощения системы и повышения спортивной справедливости.</p>
+      </div>
+      <h3 style="margin-top:1.8em;">Спринт</h3>
+      <p>Очки начисляются по сокращённой схеме: <strong>8–7–6–5–4–3–2–1</strong> для топ-8.</p>
+    </div>
+  </section>
+
+  <!-- Слайд 6: Технический регламент -->
+  <section class="slide" data-index="5">
+    <div class="slide-content">
+      <h2>Технический регламент и болид</h2>
+      <div class="two-col-reverse">
+        <div>
+          <div class="image-container">
+            <img
+              src="https://cdn.renderhub.com/alphagroup/red-bull-rb26-f1-2026-formula-1-car/red-bull-rb26-f1-2026-formula-1-car-01.jpg"
+              alt="Концепт болида Формулы-1 2026 года"
+              onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg/1280px-2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg';"
+            >
+          </div>
+          <div class="image-caption">Концепт болида 2026 года. Изображение: RenderHub</div>
+        </div>
+        <div>
+          <p><strong>Двигатель:</strong> гибридные силовые установки — 1.6-литровый турбированный V6 + системы рекуперации MGU-K и MGU-H.</p>
+          <p><strong>Аэродинамика:</strong> переднее и заднее антикрылья, диффузор и граунд-эффект (прижимная сила за счёт формы днища).</p>
+          <h3 style="margin-top:1em;">Регламент 2026 года</h3>
+          <ul>
+            <li>Болиды станут на <strong>30 кг легче</strong> и на <strong>20 см короче</strong>.</li>
+            <li>Внедряется <strong>активная аэродинамика</strong>: отказ от DRS в пользу режимов <strong>Z-mode</strong> (низкая прижимная сила) и <strong>X-mode</strong> (высокая прижимная сила при обгонах).</li>
+            <li>Значительно увеличивается доля электрической мощности гибридной установки.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 7: Команды и пилоты -->
+  <section class="slide" data-index="6">
+    <div class="slide-content">
+      <h2>Ключевые команды и пилоты</h2>
+      <div class="two-col">
+        <div>
+          <h3>Команды</h3>
+          <p><strong>Исторические:</strong> Ferrari (единственная команда, участвовавшая во всех сезонах с 1950 года), McLaren, Williams, Renault/Alpine.</p>
+          <p><strong>Современные:</strong> Red Bull Racing, Mercedes, Ferrari, McLaren, Aston Martin, Alpine и др.</p>
+          <h3 style="margin-top:1.2em;">Легендарные пилоты</h3>
+          <p>Михаэль Шумахер (7 титулов), Льюис Хэмилтон (7 титулов), Айртон Сенна, Хуан-Мануэль Фанхио, Ален Прост.</p>
+          <p><strong>Современные лидеры:</strong> Макс Ферстаппен, Льюис Хэмилтон, Шарль Леклер, Ландо Норрис и др.</p>
+        </div>
+        <div>
+          <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg/1280px-2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg" alt="Болид Формулы-1">
+          </div>
+          <div class="image-caption">Болид Haas VF-25. Фото: Wikimedia Commons</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 8: Трассы -->
+  <section class="slide" data-index="7">
+    <div class="slide-content">
+      <h2>Знаковые трассы «Классика» Ф1</h2>
+      <div class="two-col">
+        <div>
+          <div class="image-container" style="max-height:18vh;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg/640px-Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg" alt="Монако">
+          </div>
+          <div class="image-caption">Монако — самая престижная и сложная городская трасса</div>
+        </div>
+        <div>
+          <div class="image-container" style="max-height:18vh;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Monza_aerial_photo.jpg" alt="Монца">
+          </div>
+          <div class="image-caption">Монца — «Храм скорости»</div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-top:1em;">
+        <div>
+          <div class="image-container" style="max-height:18vh;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/EauRouge_Spa.JPG" alt="Eau Rouge, Спа-Франкоршам">
+          </div>
+          <div class="image-caption">Спа-Франкоршам — легендарная связка Eau Rouge</div>
+        </div>
+        <div>
+          <div class="image-container" style="max-height:18vh;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Silverstone_Circuit_vector_map.png/640px-Silverstone_Circuit_vector_map.png" alt="Сильверстоун">
+          </div>
+          <div class="image-caption">Сильверстоун — место первого Гран-при Ф1 в 1950 году</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 9: Тренды -->
+  <section class="slide" data-index="8">
+    <div class="slide-content">
+      <h2>Современные тренды и инновации</h2>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="number">💰</div>
+          <div class="label">Потолок бюджетов</div>
+          <p style="margin-top:0.6em; font-size:0.9rem;">Строгое ограничение расходов команд на разработку и производство болидов — для выравнивания конкуренции.</p>
+        </div>
+        <div class="stat-card">
+          <div class="number">🌱</div>
+          <div class="label">Устойчивое развитие</div>
+          <p style="margin-top:0.6em; font-size:0.9rem;">Цель — нулевой углеродный след к 2030 году. Переход на 100% экологически чистое синтетическое топливо с 2026 года.</p>
+        </div>
+        <div class="stat-card">
+          <div class="number">🔬</div>
+          <div class="label">Технологический перенос</div>
+          <p style="margin-top:0.6em; font-size:0.9rem;">Инновации Ф1 — гибридные системы, композитные материалы, передовая телеметрия — находят применение в гражданском автомобилестроении.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Слайд 10: Финал с фоновым изображением -->
+  <section class="slide title-slide" data-index="9">
+    <div class="hero-bg">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg/1280px-2025_Japan_GP_-_Haas_VF-25_Show_Car_-_3.jpg"
+        alt="Болид Формулы-1"
+        onerror="this.style.display='none';"
+      >
+    </div>
+    <div class="slide-content">
+      <div class="red-line"></div>
+      <h1 style="font-size:clamp(2rem,5vw,4.5rem);">Спасибо<br>за внимание</h1>
+      <p class="subtitle">Формула-1 — там, где скорость встречается с технологиями.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- Навигация -->
+<div class="nav">
+  <button id="prevBtn" aria-label="Назад"><span class="arrow arrow-left"></span></button>
+  <span class="counter" id="counter">1 / 10</span>
+  <button id="nextBtn" aria-label="Вперёд"><span class="arrow"></span></button>
+</div>
+
+<script>
+  (function() {
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+    const counter = document.getElementById('counter');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function updateUI() {
+      counter.textContent = (current + 1) + ' / ' + total;
+      progressBar.style.width = ((current + 1) / total * 100) + '%';
+    }
+
+    function goTo(index) {
+      if (index < 0) index = 0;
+      if (index >= total) index = total - 1;
+      if (index === current) return;
+
+      slides[current].classList.remove('active');
+      slides[index].classList.add('active');
+      current = index;
+      updateUI();
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        next();
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        prev();
+      }
+      if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+      if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) next();
+        else prev();
+      }
+    }, { passive: true });
+
+    let wheelLock = false;
+    document.addEventListener('wheel', function(e) {
+      if (wheelLock) return;
+      if (Math.abs(e.deltaY) < 20) return;
+      wheelLock = true;
+      setTimeout(() => { wheelLock = false; }, 700);
+      if (e.deltaY > 0) next();
+      else prev();
+    }, { passive: true });
+
+    updateUI();
+  })();
+</script>
+
+</body>
+</html>
